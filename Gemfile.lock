@@ -24,6 +24,15 @@ GIT
       decidim-core (= 0.22.0)
 
 GIT
+  remote: https://github.com/Platoniq/decidim-module-decidim_awesome
+  revision: 8179c5ad933289d2bf3b42d9b1d28f7088a7d1c1
+  specs:
+    decidim-decidim_awesome (0.6.6)
+      decidim-admin (>= 0.22.0, < 0.24)
+      decidim-core (>= 0.22.0, < 0.24)
+      redcarpet (~> 3.4)
+
+GIT
   remote: https://github.com/decidim/decidim.git
   revision: d89fa5d6495f3608e8ea6d06dac77c6a7f58a628
   branch: release/0.22-stable
@@ -845,6 +854,7 @@ DEPENDENCIES
   dalli
   decidim!
   decidim-cookies!
+  decidim-decidim_awesome!
   decidim-dev!
   decidim-navbar_links!
   decidim-term_customizer!
@@ -872,4 +882,4 @@ RUBY VERSION
    ruby 2.6.3p62
 
 BUNDLED WITH
-   2.1.4
+   2.2.11
