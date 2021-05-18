@@ -18,12 +18,41 @@ fr:
         name: Formulaire de vérification d'identité
       osp_authorization_workflow:
         name: Procédure d'autorisation
+    system:
+      organizations:
+        smtp_settings:
+          fieldsets:
+            sender: Expéditeur
     verifications:
       authorizations:
         first_login:
           actions:
             osp_authorization_handler: Vérifier avec le formulaire de vérification de l'identité
             osp_authorization_workflow: Vérifier avec le formulaire de vérification de l'identité
+  devise:
+    mailer:
+      invitation_instructions:
+        accept: Accepter l'invitation
+        accept_until: Cette invitation expirera le %{due_date}.
+        decline: Refuser l'invitation
+        hello: Bonjour %{email},
+        ignore: |-
+          Si vous ne souhaitez pas accepter l'invitation, veuillez ignorer cet e-mail.<br />
+          Votre compte ne sera pas créé avant d'avoir cliqué sur le lien ci-dessus et défini votre pseudonyme et votre mot de passe.<br /><br />
+
+          Salutations, <br /><br />
+
+          L'équipe de la démocratie permanente de Bordeaux<br /><br />
+        someone_invited_you: |-
+          Le site participation.bordeaux.fr devient l'espace numérique officiel de la démocratie permanente de la Ville de Bordeaux.
+          En y créant votre compte, vous retrouverez alors l'ensemble des contributions participatives que vous avez déposées sur debats.bordeaux.fr.<br /><br />
+
+          Nous vous invitons ainsi à créer un compte sur la nouvelle plateforme participation.bordeaux.fr mise en ligne le 19 mai 2021
+          à l'occasion du démarrage des Assises de la démocratie permanente (plus d’infos :
+          <a href="https://www.bordeaux.fr/p146826/participation-et-democratie-permanente">Participation et démocratie permanente | Bordeaux</a>).<br /><br />
+
+          Pour votre parfaite information debats.bordeaux.fr restera en ligne jusqu'en septembre 2021 comme support du Forum de la culture de la Ville.<br />
+        subject: Changement de plateforme numérique pour la démocratie permanente de Bordeaux
   layouts:
     decidim:
       footer:
