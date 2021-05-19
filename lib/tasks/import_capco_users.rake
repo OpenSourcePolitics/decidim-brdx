@@ -109,6 +109,7 @@ def import_users
   end
 
   @validated = []
+  @deleted = []
   @facebook_only = []
   @suspicious_email = []
   @suspicious = []
@@ -120,7 +121,7 @@ def import_users
       if row["email"].blank? && row["facebookId"].present? && calculate_activity(row) > 0
         @facebook_only.push(row)
       elsif calculate_activity(row) > 0
-        @validated.push(row)
+        @deleted.push(row)
       else
         @suspicious_email.push(row)
       end
@@ -136,6 +137,7 @@ def import_users
 
   Rails.logger.info "found #{@csv.count} rows"
   Rails.logger.info "validated --> #{@validated.count} rows"
+  Rails.logger.info "deleted with activity --> #{@deleted.count} rows"
   Rails.logger.info "facebook only --> #{@facebook_only.count} rows"
   Rails.logger.info "without proper email --> #{@suspicious_email.count} rows"
   Rails.logger.info "suspicious --> #{@suspicious.count} rows"
@@ -145,6 +147,13 @@ def import_users
   CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_validated.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @validated.each do |row|
+      file << row.to_h.values
+    end
+  end
+
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_deleted.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+    file << @csv.headers
+    @deleted.each do |row|
       file << row.to_h.values
     end
   end
@@ -194,23 +203,37 @@ def import_users
   #   new_user.invite!(@invited_by)
   # end
 
+  @errors = []
+
   @validated.each do |row|
     unless Decidim::User.exists?(:email => row["email"].downcase, :decidim_organization_id => @organization.id)
-      new_user = Decidim::User.new(
-        email: row["email"].downcase,
-        name: row["username"],
-        nickname: row["url"].split("/")&.last.downcase,
-        organization: @organization,
-        admin: false,
-        roles: [],
-        locale: "fr",
-        email_on_notification: false,
-        newsletter_notifications_at: nil,
-        extended_data: { "source_id": row[0] }
-      )
-      new_user.invite!(@invited_by) do |u|
-        u.skip_invitation = true
+      begin
+        new_user = Decidim::User.new(
+          email: row["email"].downcase,
+          name: row["username"],
+          nickname: Decidim::User.exists?(:nickname => row["url"]&.split("/")&.last&.downcase&.truncate(20, omission: ''), :decidim_organization_id => @organization.id) ? "" : row["url"]&.split("/")&.last&.downcase&.truncate(20, omission: ''),
+          organization: @organization,
+          admin: false,
+          roles: [],
+          locale: "fr",
+          email_on_notification: false,
+          newsletter_notifications_at: nil,
+          extended_data: { "source_id": row[0] }
+        )
+        new_user.invite!(@invited_by) do |u|
+          u.skip_invitation = true
+        end
+      rescue ActiveRecord::RecordNotUnique
+        @errors.push(row)
+        next
       end
+    end
+  end
+
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_errors.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+    file << @csv.headers
+    @errors.each do |row|
+      file << row.to_h.values
     end
   end
 
