@@ -7,6 +7,10 @@ fr:
         document_number: Numéro unique
         postal_code: Code postal
         birthday: Date de naissance
+  activerecord:
+    attributes:
+      decidim/user:
+        nickname: Surnom
   decidim:
     authorization_handlers:
       osp_authorization_handler:
