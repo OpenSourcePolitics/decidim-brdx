@@ -1,12 +1,13 @@
+---
 fr:
   activemodel:
     attributes:
-      participatory_process:
-        private_space: Espace privé
       osp_authorization_handler:
+        birthday: Date de naissance
         document_number: Numéro unique
         postal_code: Code postal
-        birthday: Date de naissance
+      participatory_process:
+        private_space: Espace privé
   activerecord:
     attributes:
       decidim/user:
@@ -16,9 +17,9 @@ fr:
       osp_authorization_handler:
         explanation: Vérifier votre identité en saisissant un numéro unique
         fields:
+          birthday: Date de naissance
           document_number: Numéro unique
           postal_code: Code postal
-          birthday: Date de naissance
         name: Formulaire de vérification d'identité
       osp_authorization_workflow:
         name: Procédure d'autorisation
@@ -57,10 +58,21 @@ fr:
 
           Pour votre parfaite information debats.bordeaux.fr restera en ligne jusqu'en septembre 2021 comme support du Forum de la culture de la Ville.<br />
         subject: Changement de plateforme numérique pour la démocratie permanente de Bordeaux
+  faker:
+    address:
+      country_code:
+      - FR
+      - FR0
+      - FR1
+      - FR2
+      - FR3
+      - FR4
+      - FR5
+      - FR6
+      - FR7
+      - FR8
+      - FR9
   layouts:
     decidim:
       footer:
         download_open_data: Données ouvertes
-  faker:
-    address:
-      country_code: ['FR','FR0','FR1','FR2','FR3','FR4','FR5','FR6','FR7','FR8','FR9']
