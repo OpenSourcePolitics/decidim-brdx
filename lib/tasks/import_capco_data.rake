@@ -4,12 +4,12 @@ require "decidim/core"
 require "csv"
 
 namespace :decidim do
-  Rails.logger = Logger.new(STDOUT)
-
   namespace :capco_data do
     namespace :proposals do
       desc "Import proposals from CSV"
       task import: :environment do |task|
+        Rails.logger = Logger.new(STDOUT)
+
         # USAGE : bundle exec rake decidim:capco_data:proposals:import <organisation_host> <process_slug> <component_id> <file_path>
         ARGV.each { |a| task a.to_sym do ; end }
         @ROOT = task.application.original_dir
@@ -53,6 +53,8 @@ namespace :decidim do
     namespace :projects do
       desc "Import budget projects from CSV"
       task import: :environment do |task|
+        Rails.logger = Logger.new(STDOUT)
+
         # USAGE : bundle exec rake decidim:capco_data:projects:import <organisation_host> <process_slug> <budget_component_id> <proposal_component_id> <file_path>
         ARGV.each { |a| task a.to_sym do ; end }
         @ROOT = task.application.original_dir
@@ -103,6 +105,8 @@ namespace :decidim do
     namespace :results do
       desc "Import results from CSV"
       task import: :environment do |task|
+        Rails.logger = Logger.new(STDOUT)
+
         # USAGE : bundle exec rake decidim:capco_data:budget:import <organisation_host> <process_slug> <accountability_component_id> <budget_component_id> <file_path>
         ARGV.each { |a| task a.to_sym do ; end }
         @ROOT = task.application.original_dir

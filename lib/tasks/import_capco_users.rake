@@ -12,11 +12,11 @@ require "csv"
 
 
 namespace :decidim do
-  Rails.logger = Logger.new(STDOUT)
-
   namespace :capco_users do
     desc "Import users from CSV"
     task import: :environment do |task|
+      Rails.logger = Logger.new(STDOUT)
+
       ARGV.each { |a| task a.to_sym do ; end }
       @ROOT = task.application.original_dir
       @TYPES = {}
