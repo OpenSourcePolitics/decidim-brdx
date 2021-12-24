@@ -17,7 +17,7 @@ describe "Account", type: :system do
       visit decidim.root_path
 
       within ".topbar__user__logged" do
-          find("a", text: user.name).hover
+        find("a", text: user.name).hover
 
         find("a", text: "My account").click
       end

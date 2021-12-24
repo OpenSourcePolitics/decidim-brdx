@@ -10,26 +10,25 @@ require "csv"
 # end
 #
 
-
 namespace :decidim do
   namespace :capco_users do
     desc "Import users from CSV"
     task import: :environment do |task|
       Rails.logger = Logger.new(STDOUT)
 
-      ARGV.each { |a| task a.to_sym do ; end }
+      ARGV.each { |a| task a.to_sym do; end }
       @ROOT = task.application.original_dir
       @TYPES = {}
 
-      if Decidim::Organization.exists?(:host => ARGV[1])
-        @organization = Decidim::Organization.find_by(:host => ARGV[1])
+      if Decidim::Organization.exists?(host: ARGV[1])
+        @organization = Decidim::Organization.find_by(host: ARGV[1])
       else
         Rails.logger.error "Could not find any organization with host \"#{ARGV[1]}\""
         exit 1
       end
 
-      if Decidim::User.exists?(:email => ARGV[2], :admin => true, :decidim_organization_id => @organization.id)
-        @invited_by = Decidim::User.find_by(:email => ARGV[2], :admin => true)
+      if Decidim::User.exists?(email: ARGV[2], admin: true, decidim_organization_id: @organization.id)
+        @invited_by = Decidim::User.find_by(email: ARGV[2], admin: true)
       else
         Rails.logger.error "Could not find an administrator with email \"#{ARGV[2]}\""
         exit 1
@@ -42,7 +41,6 @@ namespace :decidim do
     end
   end
 end
-
 
 def path_for(path)
   if path.start_with?("/")
@@ -65,19 +63,19 @@ def check_file(path, ext = nil)
     check = false
   end
 
-  if ext.present? && File.extname(path) != ".#{ext.to_s}"
-    Rails.logger.error "File extension does not match \"#{ext.to_s}\""
+  if ext.present? && File.extname(path) != ".#{ext}"
+    Rails.logger.error "File extension does not match \"#{ext}\""
     check = false
   end
 
-  return check
+  check
 end
 
 def suspicious_date(row)
   if row["confirmedAccountAt"].present? && row["lastLogin"].present?
-    return row["confirmedAccountAt"][0..-3] == row["lastLogin"][0..-3]
+    row["confirmedAccountAt"][0..-3] == row["lastLogin"][0..-3]
   else
-    return true
+    true
   end
 end
 
@@ -100,9 +98,8 @@ def calculate_activity(row)
 end
 
 def import_users
-
   if check_file(ARGV[3], :csv)
-    @csv = CSV.read(path_for(ARGV[3]), col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true)
+    @csv = CSV.read(path_for(ARGV[3]), col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true)
   else
     Rails.logger.error "Could not load CSV file \"#{ARGV[3]}\""
     exit 1
@@ -116,7 +113,6 @@ def import_users
   @no_activity = []
 
   @csv.each do |row|
-
     if row["email"].blank? || !ValidEmail2::Address.new(row["email"]).valid? || row["emailConfirmed"] == "No"
       if row["email"].blank? && row["facebookId"].present? && calculate_activity(row) > 0
         @facebook_only.push(row)
@@ -132,7 +128,6 @@ def import_users
     else
       @validated.push(row)
     end
-
   end
 
   Rails.logger.info "found #{@csv.count} rows"
@@ -143,49 +138,47 @@ def import_users
   Rails.logger.info "suspicious --> #{@suspicious.count} rows"
   Rails.logger.info "without activity #{@no_activity.count} rows"
 
-
-  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_validated.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_validated.csv", mode = "w+", col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @validated.each do |row|
       file << row.to_h.values
     end
   end
 
-  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_deleted.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_deleted.csv", mode = "w+", col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @deleted.each do |row|
       file << row.to_h.values
     end
   end
 
-  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_facebook_only.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_facebook_only.csv", mode = "w+", col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @facebook_only.each do |row|
       file << row.to_h.values
     end
   end
 
-  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_suspicious_email.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_suspicious_email.csv", mode = "w+", col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @suspicious_email.each do |row|
       file << row.to_h.values
     end
   end
 
-  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_suspicious.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_suspicious.csv", mode = "w+", col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @suspicious.each do |row|
       file << row.to_h.values
     end
   end
 
-  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_no_activity.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_no_activity.csv", mode = "w+", col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @no_activity.each do |row|
       file << row.to_h.values
     end
   end
-
 
   # unless Decidim::User.exists?(:email => @validated.first["email"].downcase, :decidim_organization_id => @organization.id)
   #   new_user = Decidim::User.new(
@@ -206,35 +199,34 @@ def import_users
   @errors = []
 
   @validated.each do |row|
-    unless Decidim::User.exists?(:email => row["email"].downcase, :decidim_organization_id => @organization.id)
-      begin
-        new_user = Decidim::User.new(
-          email: row["email"].downcase,
-          name: row["username"],
-          nickname: Decidim::User.exists?(:nickname => row["url"]&.split("/")&.last&.downcase&.truncate(20, omission: ''), :decidim_organization_id => @organization.id) ? "" : row["url"]&.split("/")&.last&.downcase&.truncate(20, omission: ''),
-          organization: @organization,
-          admin: false,
-          roles: [],
-          locale: "fr",
-          email_on_notification: false,
-          newsletter_notifications_at: nil,
-          extended_data: { "source_id": row[0] }
-        )
-        new_user.invite!(@invited_by) do |u|
-          u.skip_invitation = true
-        end
-      rescue ActiveRecord::RecordNotUnique
-        @errors.push(row)
-        next
+    next if Decidim::User.exists?(email: row["email"].downcase, decidim_organization_id: @organization.id)
+
+    begin
+      new_user = Decidim::User.new(
+        email: row["email"].downcase,
+        name: row["username"],
+        nickname: Decidim::User.exists?(nickname: row["url"]&.split("/")&.last&.downcase&.truncate(20, omission: ""), decidim_organization_id: @organization.id) ? "" : row["url"]&.split("/")&.last&.downcase&.truncate(20, omission: ""),
+        organization: @organization,
+        admin: false,
+        roles: [],
+        locale: "fr",
+        email_on_notification: false,
+        newsletter_notifications_at: nil,
+        extended_data: { "source_id": row[0] }
+      )
+      new_user.invite!(@invited_by) do |u|
+        u.skip_invitation = true
       end
+    rescue ActiveRecord::RecordNotUnique
+      @errors.push(row)
+      next
     end
   end
 
-  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_errors.csv", mode = "w+", col_sep: ';', headers: true, skip_blanks: true, liberal_parsing: true) do |file|
+  CSV.open(@ROOT + "/tmp/#{File.basename(ARGV[3], ".csv")}_errors.csv", mode = "w+", col_sep: ";", headers: true, skip_blanks: true, liberal_parsing: true) do |file|
     file << @csv.headers
     @errors.each do |row|
       file << row.to_h.values
     end
   end
-
 end
