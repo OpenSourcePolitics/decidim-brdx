@@ -75,3 +75,7 @@ Rails/SkipsModelValidations:
 Rails/Validation:
   Include:
     - app/models/**/*.rb
+
+Rails/BulkChangeTable:
+  Exclude:
+    - db/**/*
